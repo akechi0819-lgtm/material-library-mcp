@@ -1,0 +1,11 @@
+# Local MCP runtime and credentials
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+*.env
+credentials/
+inputs/
+runs/
+ICC物料/
