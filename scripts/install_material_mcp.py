@@ -124,7 +124,7 @@ def register_codex(venv_python: Path, credentials_path: Path) -> bool:
 
 
 def register_workbuddy(venv_python: Path, credentials_path: Path) -> Path:
-    config_path = Path.home() / ".workbuddy" / "mcp.json"
+    config_path = Path.home() / ".workbuddy-ai" / "mcp.json"
     config_path.parent.mkdir(parents=True, exist_ok=True)
     if config_path.exists():
         try:

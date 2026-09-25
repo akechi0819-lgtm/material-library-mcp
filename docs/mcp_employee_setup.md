@@ -39,7 +39,7 @@ python3 scripts/install_material_mcp.py --client codex
 
 ### WorkBuddy 或其他 MCP 客户端
 
-安装器会更新 WorkBuddy 用户级 `~/.workbuddy/mcp.json`，保留其他 MCP 配置；完成后在 WorkBuddy 刷新 MCP 设置。指定 WorkBuddy 的命令是：
+安装器会更新 WorkBuddy 5.5.2 当前界面显示的用户级 `~/.workbuddy-ai/mcp.json`，保留其他 MCP 配置；完成后在 WorkBuddy 刷新 MCP 设置。指定 WorkBuddy 的命令是：
 
 ```bash
 python3 scripts/install_material_mcp.py --client workbuddy
