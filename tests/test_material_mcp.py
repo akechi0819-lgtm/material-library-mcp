@@ -1,7 +1,7 @@
 import io
-import json
+import sys
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 from mcp_server import server
@@ -125,10 +125,13 @@ class MaterialMcpTests(unittest.TestCase):
             with patch.object(verify_teedy_account, "user_client", return_value=client), redirect_stdout(io.StringIO()):
                 self.assertEqual(verify_teedy_account.main(), 0)
 
-    def test_installer_reads_credentials_as_json_without_echoing(self):
-        secret = {"base_url": "https://teedy.example", "username": "employee", "password": "not-for-logs"}
-        with patch.object(install_material_mcp.sys, "stdin", io.StringIO(json.dumps(secret))):
-            self.assertEqual(install_material_mcp.read_chat_credentials(), secret)
+    def test_installer_requires_an_interactive_terminal(self):
+        with patch.object(sys, "argv", ["install_material_mcp.py", "--client", "workbuddy"]), \
+             patch.object(install_material_mcp.sys.stdin, "isatty", return_value=False), \
+             redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                install_material_mcp.main()
+        self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == "__main__":

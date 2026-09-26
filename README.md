@@ -4,15 +4,15 @@
 
 ## 安装
 
-把公开仓库链接发给 WorkBuddy 或 Codex：
+把公开仓库链接交给 WorkBuddy 或 Codex，并让它按安装说明引导：
 
 ```text
-请帮我安装这个 MCP：https://github.com/akechi0819-lgtm/material-library-mcp 。先阅读项目使用说明，再引导我完成后续配置。
+请帮我安装这个 MCP：https://github.com/akechi0819-lgtm/material-library-mcp 。先阅读项目使用说明，再引导我完成配置。
 ```
 
-Agent 读取 [`docs/mcp_employee_setup.md`](docs/mcp_employee_setup.md)，然后在对话中询问 Teedy HTTPS 地址、用户名和密码，并通过安装器完成本机运行环境、登录验证和客户端注册。密码不进入命令行参数或 GitHub 文件；凭据写入本机权限受限的配置文件。Agent 不得在回复中复述密码。
+Agent 读取 [`docs/mcp_employee_setup.md`](docs/mcp_employee_setup.md)，准备依赖与客户端配置，并引导用户在交互终端运行安装器。Teedy 地址、用户名可在终端输入；密码使用隐藏提示，不在聊天中提交，也不放入命令行参数。凭据保存在本机权限受限文件。
 
-对话中提交的密码会留在该 Agent 的会话记录中。Teedy ADMIN 账号也可登录 Teedy 网页/API 并执行管理操作；MCP 的只读约束只作用于 MCP 工具调用。
+Reader 和 ADMIN 均受支持。MCP 工具只提供读取和下载；ADMIN 账号在 Teedy 网页/API 中的权限仍由 Teedy 自身控制。
 
 ## 使用
 
