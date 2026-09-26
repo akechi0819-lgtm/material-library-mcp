@@ -35,11 +35,14 @@ Codex 安装时改为 `--client codex`。安装器提示输入远端 Teedy HTTPS
 - 将 MCP 程序复制到用户数据目录，避免依赖临时工作区。
 - 把 Teedy 凭据写入用户私有配置目录，并设置本机文件权限。
 - 在当前 WorkBuddy 或 Codex 用户配置中注册名为 `material-library` 的 MCP，并安装触发技能。
-- 提示开启一个新对话以加载技能和 MCP。
+- WorkBuddy 首次连接时，提示在「专家·技能·连接器 → 连接器 → 自定义连接器」里信任并启用 `material-library`。
+- 提示开启一个新对话，然后明确输入 `$素材库MCP`。
 
 验证失败时，安装器不会启用这组凭据；提示检查账号权限和 Teedy 地址。
 
-WorkBuddy 使用用户级 `~/.workbuddy-ai/mcp.json`，技能安装到 `~/.workbuddy-ai/skills/material-library/`。Codex 使用用户级 MCP 配置和 `~/.agents/skills/material-library/`。
+WorkBuddy 使用用户级 `~/.workbuddy-ai/.mcp.json`，技能安装到 `~/.workbuddy-ai/skills/material-library/`。Codex 使用用户级 MCP 配置和 `~/.agents/skills/material-library/`。
+
+WorkBuddy 首次连接时会提示「首次连接此 MCP 服务需要您的信任确认」。在自定义连接器里点击「信任」，并确认 `material-library` 已启用、显示 4/4 个工具后，再新建对话测试。
 
 ## 使用与触发
 

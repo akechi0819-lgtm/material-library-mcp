@@ -10,7 +10,7 @@
 请帮我安装这个 MCP：https://github.com/akechi0819-lgtm/material-library-mcp 。先阅读项目使用说明，再引导我完成配置。
 ```
 
-Agent 读取 [`docs/mcp_employee_setup.md`](docs/mcp_employee_setup.md)，准备依赖与客户端配置，并引导用户在交互终端运行安装器。Teedy 地址、用户名可在终端输入；密码使用隐藏提示，不在聊天中提交，也不放入命令行参数。凭据保存在本机权限受限文件。
+Agent 读取 [`docs/mcp_employee_setup.md`](docs/mcp_employee_setup.md)，准备依赖与客户端配置，并引导用户在交互终端运行安装器。Teedy 地址、用户名可在终端输入；密码使用隐藏提示，不在聊天中提交，也不放入命令行参数。凭据保存在本机权限受限文件。WorkBuddy 首次连接后，还需在「自定义连接器」里信任并启用 `material-library`，再新建对话使用。
 
 Reader 和 ADMIN 均受支持。MCP 工具只提供读取和下载；ADMIN 账号在 Teedy 网页/API 中的权限仍由 Teedy 自身控制。
 

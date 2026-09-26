@@ -126,7 +126,7 @@ def register_codex(venv_python: Path, credentials_path: Path) -> None:
 
 
 def register_workbuddy(venv_python: Path, credentials_path: Path) -> Path:
-    config_path = Path.home() / ".workbuddy-ai" / "mcp.json"
+    config_path = Path.home() / ".workbuddy-ai" / ".mcp.json"
     config_path.parent.mkdir(parents=True, exist_ok=True)
     if config_path.exists():
         try:
@@ -148,7 +148,7 @@ def register_workbuddy(venv_python: Path, credentials_path: Path) -> Path:
         "env": {"YUKI_TEEDY_CREDENTIALS_FILE": str(credentials_path)},
         "description": "素材库MCP",
     }
-    pending = config_path.with_name("mcp.json.pending")
+    pending = config_path.with_name(f"{config_path.name}.pending")
     pending.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     os.replace(pending, config_path)
     return config_path
@@ -205,7 +205,8 @@ def main() -> int:
         print(f"Installed skill to {skill_path}. Start a new Codex thread and type $素材库MCP to search.")
     elif client_mode == "workbuddy":
         config_path = register_workbuddy(venv_python, credentials_path)
-        print(f"Registered 素材库MCP in {config_path}. Reload MCP settings, start a new WorkBuddy chat, and type $素材库MCP to search.")
+        print(f"Registered 素材库MCP in {config_path}.")
+        print("In WorkBuddy, open Experts · Skills · Connectors → Connectors → Custom Connector, trust and enable material-library, then start a new chat and type $素材库MCP to search.")
     return 0
 
 
