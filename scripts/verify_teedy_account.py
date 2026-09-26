@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify one employee's remote Teedy login and reader access."""
+"""Verify one configured Teedy login and its ability to access the library."""
 from __future__ import annotations
 
 import sys
@@ -20,10 +20,14 @@ def main() -> int:
         client = user_client()
         identity = client.whoami()
         groups = identity.get("groups") or []
-        if "readers" not in groups:
-            raise TeedyError("account is valid but is not in the Teedy readers group; ask the Teedy administrator to add it")
+        base_functions = identity.get("base_functions") or []
+        is_admin = "ADMIN" in base_functions
+        can_read = is_admin or "READ" in base_functions or "readers" in groups
+        if not can_read:
+            raise TeedyError("account is valid but has no Teedy READ access; grant READ access or add it to the readers group")
 
-        print(f"Teedy login=ok user={identity.get('username')} readers_group=ok")
+        role = "admin" if is_admin else "reader"
+        print(f"Teedy login=ok user={identity.get('username')} access={role}")
         return 0
     except (TeedyError, httpx.HTTPError, OSError) as exc:
         print(f"Teedy account verification failed: {exc}", file=sys.stderr)

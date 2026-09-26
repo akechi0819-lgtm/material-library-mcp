@@ -9,7 +9,7 @@ description: >
 
 只在用户本轮明确写下 `$素材库MCP` 时检索。未出现触发词就不要调用素材库工具。
 
-MCP 使用当前员工自己的非管理员 Teedy 账号。不要使用管理员账号，不要上传素材、改标签或删除文档。
+MCP 使用当前配置的 Teedy Reader 或 ADMIN 账号。MCP 工具只检索、查看、预览和下载；不要通过 MCP 上传素材、改标签或删除文档。`get_material` 返回的 `writable` 表示 Teedy 对该账号的 ACL，不代表 MCP 提供写工具。
 
 ## 检索流程
 

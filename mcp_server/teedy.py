@@ -155,9 +155,6 @@ def user_client() -> TeedyClient:
     )
     try:
         client.login()
-        identity = client.whoami()
-        if "ADMIN" in (identity.get("base_functions") or []):
-            raise TeedyError("the MCP account must not have Teedy ADMIN permission")
         return client
     except Exception:
         client.close()

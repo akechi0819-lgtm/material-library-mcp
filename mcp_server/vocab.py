@@ -22,10 +22,14 @@ def build_lookup(canonical_names: list[str], alias_map: dict[str, list[str]] | N
     for name in canonical_names:
         lookup[_fold(name)] = name
     for canonical, aliases in alias_map.items():
-        target = names.get(canonical, canonical)
-        lookup[_fold(canonical)] = target
+        target = names.get(canonical)
+        if target is None:
+            continue
+        lookup.setdefault(_fold(canonical), target)
         for alias in aliases:
-            lookup[_fold(alias)] = target
+            key = _fold(alias)
+            if key:
+                lookup.setdefault(key, target)
     return lookup
 
 
@@ -48,39 +52,42 @@ def resolve_tags(raw_tags: list[str], canonical_names: list[str]) -> tuple[list[
     return resolved, unknown
 
 
-def extract_tags_from_query(query: str, canonical_names: list[str]) -> list[str]:
+def extract_tags_from_query(query: str, canonical_names: list[str], max_tags: int = 3) -> list[str]:
     if not query or not query.strip():
         return []
     lookup = build_lookup(canonical_names)
-    text = query
     folded = _fold(query)
-    hits: list[tuple[int, str]] = []
+    hits: list[tuple[int, int, str]] = []
     for key, name in lookup.items():
         if not key:
             continue
-        idx = folded.find(key) if key.isascii() else text.find(key)
-        if idx < 0:
-            idx = text.find(key)
+        idx = folded.find(key)
         if idx >= 0:
-            hits.append((len(key), name))
-    hits.sort(key=lambda item: item[0], reverse=True)
+            hits.append((idx, idx + len(key), name))
+    hits.sort(key=lambda item: (-(item[1] - item[0]), item[0], item[2]))
     out: list[str] = []
     seen: set[str] = set()
-    for _, name in hits:
-        if name not in seen:
-            seen.add(name)
-            out.append(name)
+    spans: list[tuple[int, int]] = []
+    for start, end, name in hits:
+        if name in seen or any(start < other_end and end > other_start for other_start, other_end in spans):
+            continue
+        seen.add(name)
+        spans.append((start, end))
+        out.append(name)
+        if len(out) >= max(1, max_tags):
+            break
     return out
 
 
 def remaining_keywords(query: str, tags: list[str], canonical_names: list[str]) -> str:
     if not query:
         return ""
+    import re
+
     leftover = query
     lookup = build_lookup(canonical_names)
     keys = [key for key, name in lookup.items() if name in tags]
     keys.sort(key=len, reverse=True)
     for key in keys:
-        leftover = leftover.replace(key, " ")
-        leftover = leftover.replace(key.casefold(), " ")
+        leftover = re.sub(re.escape(key), " ", leftover, flags=re.IGNORECASE if key.isascii() else 0)
     return " ".join(leftover.split())

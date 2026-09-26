@@ -37,7 +37,7 @@ mcp = FastMCP(
         "仅当用户在本轮明确写下 $素材库MCP 时使用这些工具。"
         "普通编程、其他项目、随口提到小红书/KET 都不要搜。"
         "先 list_tags，把口语映射到标签 name，再 search_materials。"
-        "以当前员工自己的 Teedy 账号访问；标签优先于关键词。不要上传、改标签、删文档。"
+        "以当前已配置的 Teedy 账号访问；账号可以是 ADMIN 或具备 READ 的 Reader。MCP 工具只检索、预览和下载，不上传、改标签或删文档。"
         "当前标签是 v0。结果必须给出预览图 URL 和 zip/文件下载链接，不要只给仓库打开页。"
         "这些链接受 Teedy 登录和权限保护；打开链接的浏览器需要登录同一个 Teedy 服务器。"
     ),
@@ -112,18 +112,6 @@ def _canonical_tag_names(client: TeedyClient) -> list[str]:
     return [t["name"] for t in client.list_tags() if t.get("name")]
 
 
-def _merge(primary: list[dict[str, Any]], extra: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    seen: set[str] = set()
-    out: list[dict[str, Any]] = []
-    for item in primary + extra:
-        doc_id = item.get("id")
-        if not doc_id or doc_id in seen:
-            continue
-        seen.add(doc_id)
-        out.append(item)
-    return out
-
-
 @mcp.tool()
 def list_tags() -> dict[str, Any]:
     """列出仓库当前标签和口语别名。检索前先调用，把用户说法映射到 name。"""
@@ -179,6 +167,16 @@ def search_materials(tags: list[str] | None = None, query: str | None = None, li
         for name in inferred:
             if name not in used_tags:
                 used_tags.append(name)
+
+        empty_tags: list[str] = []
+        usable_tags: list[str] = []
+        for name in used_tags:
+            tag_payload = client.search_documents(f"tag:{name}", limit=1)
+            if tag_payload.get("documents") or int(tag_payload.get("total") or 0) > 0:
+                usable_tags.append(name)
+            else:
+                empty_tags.append(name)
+        used_tags = usable_tags
         leftover = remaining_keywords(query, used_tags, canonical) if query else ""
 
         def run(search: str, reason: str) -> list[dict[str, Any]]:
@@ -188,25 +186,15 @@ def search_materials(tags: list[str] | None = None, query: str | None = None, li
         items: list[dict[str, Any]] = []
         match = "none"
         if used_tags:
-            and_query = " ".join(f"tag:{name}" for name in used_tags)
+            tags_query = " ".join(f"tag:{name}" for name in used_tags)
+            and_query = tags_query
             if leftover:
                 and_query = f"{and_query} {leftover}"
             items = run(and_query, "tag_and")
             match = "tag_and"
-            if not items and len(used_tags) > 1:
-                or_hits: list[dict[str, Any]] = []
-                for name in used_tags:
-                    or_hits.extend(run(f"tag:{name}", "tag_or"))
-                items = _merge([], or_hits)[:limit]
-                match = "tag_or"
-        if leftover and (not used_tags or not items):
-            keyword_hits = run(leftover if leftover else query or "", "keyword")
-            if items:
-                items = _merge(items, keyword_hits)[:limit]
-            else:
-                items = keyword_hits
-                match = "keyword"
-        elif query and not used_tags:
+            if not items and leftover:
+                items = run(tags_query, "tag_and")
+        elif query:
             items = run(query, "keyword")
             match = "keyword"
 
@@ -214,6 +202,7 @@ def search_materials(tags: list[str] | None = None, query: str | None = None, li
             "match": match,
             "used_tags": used_tags,
             "inferred_tags": inferred,
+            "empty_tags": empty_tags,
             "keywords": leftover or None,
             "total": len(items),
             "items": items,
